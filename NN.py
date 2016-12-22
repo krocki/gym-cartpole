@@ -2,9 +2,10 @@
 # @Author: krocki
 # @Date:   2016-12-21 10:21:06
 # @Last Modified by:   krocki
-# @Last Modified time: 2016-12-21 18:53:35
+# @Last Modified time: 2016-12-21 19:15:42
+#
+# a simple implementation of a feedforward NN
 
-# a simple implementation of a multilayer NN
 import numpy as np
 
 class NN:
@@ -12,32 +13,22 @@ class NN:
 	layers = [] # stack of layers
 
 	def __init__(self, layers):
-
-		print "NN init"
 		self.layers = layers
 
 	def forward(self):
-
-		print "NN forward"
 		for l in self.layers:
-			print l
 			l.forward()
 
 	def backward(self):
-
-		print "NN backward"
+		for l in reversed(self.layers):
+			l.backward()
 
 class Layer:
 
-	x = [] # inputs
-	y = [] # outputs
-
-	dx = [] # input grads
-	dy = [] # output grads
+	# inputs, outputs, input grads, output grads
+	x, y, dx, dy = [], [], [], []
 
 	def __init__(self, inputs, outputs, batchsize):
-
-		print "layer init"
 		self.x = np.zeros((inputs, batchsize), dtype=np.float)
 		self.y = np.zeros((outputs, batchsize), dtype=np.float)
 		self.dx = np.zeros_like(self.x, dtype=np.float)
@@ -57,95 +48,72 @@ class Layer:
 
 class Linear(Layer):
 
-	W = [] # weights x-y
-	b = [] # biases
-
-	dW = [] # W grads
-	db = [] # b grads
+	# weights x-y, biases, w grads, b grads
+	W, b, dW, db = [], [], [], []
 
 	def __init__(self, inputs, outputs, batchsize):
-
 		Layer.__init__(self, inputs, outputs, batchsize)
 		self.W = 0.1 * np.random.randn(outputs, inputs)
 		self.b = np.zeros((outputs, 1), dtype=np.float)
 		self.resetgrads();
 
-		print "linear init"
-
 	def forward(self):
-
-		self.y = np.dot(self.W, self.x) + self.b;
 		print "linear forward"
+		self.y = np.dot(self.W, self.x) + self.b;
 
 	def backward(self):
-
+		print "linear back"
 		self.dW = np.dot(self.dy, self.x.T)
-		self.db = np.sum(self.dy, 2)
+		self.db = np.sum(self.dy, axis=1)
 		self.dx = np.dot(self.W.T, self.dy)
 
 	def resetgrads(self):
-		
 		self.dW = np.zeros_like(self.W, dtype=np.float)
 		self.db = np.zeros_like(self.db, dtype=np.float)
 
 	def applygrads(self, alpha):
-
 		self.b += alpha * self.db;
 		self.W += alpha * self.dW;
 
 class Softmax(Layer):
 
 	def __init__(self, inputs, outputs, batchsize):
-
 		Layer.__init__(self, inputs, outputs, batchsize)
-		print "softmax init"
 
 	def forward(self):
-
-		self.y = softmax(self.x);
 		print "softmax forward"
+		self.y = softmax(self.x);
 
 	def backward(self):
-
+		print "softmax back"
 		self.dx = self.dy - self.y;
-
 
 class ReLU(Layer):
 
 	def __init__(self, inputs, outputs, batchsize):
-
 		Layer.__init__(self, inputs, outputs, batchsize)
-		print "ReLU init"
 
 	def forward(self):
-
+		print "relu forward"
 		self.y = rectify(self.x);
-		print "ReLU forward"
 
 	def backward(self):
-
+		print "relu back"
 		self.dx = drectify(self.y) * self.dy;
-
 
 #helper functions
 def rectify(x):
-
 	return np.maximum(x, 0);
 
 def drectify(x):
-
 	return x > 0;
 
+#probs(class) = exp(x, class)/sum(exp(x, class))
 def softmax(x):
-
-	#probs(class) = exp(x, class)/sum(exp(x, class))
-
 	e = np.exp(x);
-
 	sums = np.sum(e, axis=0);
-
 	return e / sums;
 
-def xentropy(predictions, targets):
-
+#cross-entropy
+def crossentropy(predictions, targets):
 	return -np.sum (np.log(np.sum(targets * predictions, axis=0)))

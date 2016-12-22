@@ -2,7 +2,7 @@
 # @Author: krocki
 # @Date:   2016-12-21 10:22:24
 # @Last Modified by:   krocki
-# @Last Modified time: 2016-12-21 18:47:57
+# @Last Modified time: 2016-12-21 19:15:25
 
 from NN import *
 # import Linear
@@ -19,3 +19,4 @@ layers = [
 nn = NN(layers)
 
 nn.forward()
+nn.backward()
