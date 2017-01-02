@@ -2,7 +2,7 @@
 # @Author: krocki
 # @Date:   2016-12-23 17:56:26
 # @Last Modified by:   krocki
-# @Last Modified time: 2017-01-02 11:57:50
+# @Last Modified time: 2017-01-02 12:37:38
 
 import numpy as np
 from NN import *
@@ -31,9 +31,9 @@ class NeuralPolicy():
 		# Policy.__init__(self)
 
 		layers = [
-			Linear(4, 32, self.batchsize),
-			ReLU(32, 32, self.batchsize),
-			Linear(32, 1, self.batchsize),
+			Linear(4, 64, self.batchsize),
+			ReLU(64, 64, self.batchsize),
+			Linear(64, 1, self.batchsize),
 			Sigmoid(1, 1, self.batchsize)
 			# Softmax(2, 1, self.batchsize)
 		]
@@ -45,6 +45,7 @@ class NeuralPolicy():
 		for i in reversed(range(self.nn.num_layers)):
 			self.nn.layers[i].resetgrads()
 			self.nn.layers[i].backward()
+			self.nn.layers[i].resetgrads()
 
 	def backward(self, epx, eph, epdlogp):
 

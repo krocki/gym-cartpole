@@ -2,7 +2,7 @@
 # @Author: krocki
 # @Date:   2016-12-21 10:21:06
 # @Last Modified by:   krocki
-# @Last Modified time: 2017-01-02 11:51:55
+# @Last Modified time: 2017-01-02 12:37:04
 
 # a simple implementation of a feedforward NN
 
@@ -88,7 +88,7 @@ class Linear(Layer):
 		self.b += self.db * alpha
 		self.W += self.dW * alpha
 		print self.W
-
+		
 class Softmax(Layer):
 
 	def __init__(self, inputs, outputs, batchsize):

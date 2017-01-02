@@ -2,7 +2,7 @@
 # @Author: kmrocki
 # @Date:   2016-12-21 09:39:30
 # @Last Modified by:   krocki
-# @Last Modified time: 2017-01-02 11:56:44
+# @Last Modified time: 2017-01-02 14:33:10
 
 # based on tutorial from
 # https://gym.openai.com/docs
@@ -15,7 +15,7 @@ env = gym.make('CartPole-v0')
 
 policy = NeuralPolicy()
 episode_number = 0
-learningrate = 5*1e-2
+learningrate = 1e-2
 gamma = 0.99 # discount factor for reward
 performance = 0
 
@@ -76,7 +76,8 @@ for i_episode in range(1000):
 			xs,hs,dlogps,drs = [],[],[],[] # reset array memory
 
 			sum_epr = discount_rewards(epr)
-			print sum_epr
+			sum_epr -= np.mean(sum_epr)
+			sum_epr /= np.std(sum_epr)
 
 			epdlogp *= sum_epr # modulate the gradient with advantage (PG magic happens right here.)
 			policy.backward(epx, eph, epdlogp)
