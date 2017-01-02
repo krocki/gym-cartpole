@@ -2,7 +2,7 @@
 # @Author: krocki
 # @Date:   2016-12-21 10:21:06
 # @Last Modified by:   krocki
-# @Last Modified time: 2016-12-28 17:38:02
+# @Last Modified time: 2017-01-02 11:51:55
 
 # a simple implementation of a feedforward NN
 
@@ -68,7 +68,7 @@ class Linear(Layer):
 
 	def __init__(self, inputs, outputs, batchsize):
 		Layer.__init__(self, inputs, outputs, batchsize)
-		self.W = 0.1 * np.random.randn(outputs, inputs)
+		self.W = np.random.randn(outputs,inputs) / np.sqrt(inputs)
 		self.b = np.zeros((outputs, 1), dtype=np.float)
 		self.resetgrads();
 
@@ -87,6 +87,7 @@ class Linear(Layer):
 	def applygrads(self, alpha):
 		self.b += self.db * alpha
 		self.W += self.dW * alpha
+		print self.W
 
 class Softmax(Layer):
 
