@@ -2,7 +2,7 @@
 # @Author: krocki
 # @Date:   2017-01-03 12:42:45
 # @Last Modified by:   krocki
-# @Last Modified time: 2017-01-03 19:01:44
+# @Last Modified time: 2017-01-03 19:06:23
 
 # based on Andrej Karpathy's PG code
 # https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
@@ -159,7 +159,3 @@ while episode_number < episodes:
 	history.append(running_reward)
 	reward_sum = 0
 	observation = env.reset() # reset env
-
-if record:
-	env.close()
-	gym.upload(name, api_key="sk_s6cxxYISFqz0GYdQ42zxA")
