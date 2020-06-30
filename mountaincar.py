@@ -8,7 +8,7 @@
 # https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5
 
 import numpy as np
-import cPickle as pickle
+import pickle
 import gym
 from gym import wrappers
 
@@ -47,21 +47,21 @@ else:
   model = {}
   model['W1'] = np.random.randn(H,D) / np.sqrt(D)
   model['W2'] = np.random.randn(A,H) / np.sqrt(H)
-  
-grad_buffer = { k : np.zeros_like(v) for k,v in model.iteritems() }
-rmsprop_cache = { k : np.zeros_like(v) for k,v in model.iteritems() }
+
+grad_buffer = { k : np.zeros_like(v) for k,v in model.items() }
+rmsprop_cache = { k : np.zeros_like(v) for k,v in model.items() }
 
 def softmax(x):
-	e = np.exp(x);
-	sums = np.sum(e, axis=0);
-	return e / sums;
+  e = np.exp(x);
+  sums = np.sum(e, axis=0);
+  return e / sums;
 
 def discount_rewards(r):
   discounted_r = np.zeros_like(r)
   running_add = 0
-  for t in reversed(xrange(0, r.size)):
-	running_add = running_add * gamma + r[t]
-	discounted_r[t] = running_add
+  for t in reversed(range(0, r.size)):
+    running_add = running_add * gamma + r[t]
+    discounted_r[t] = running_add
   return discounted_r
 
 def policy_forward(x):
@@ -81,21 +81,21 @@ def policy_backward(eph, epdlogp):
 
 def sample(probs):
 
-	r = np.random.rand(1)
-	idx = 0
+  r = np.random.rand(1)
+  idx = 0
 
-	if probs.shape[0] == 1:
-		if r < probs[0]: idx = 0
-		else: idx = 1
+  if probs.shape[0] == 1:
+    if r < probs[0]: idx = 0
+    else: idx = 1
 
-	else:
-		cdf = np.cumsum(probs)
-		for i in range(probs.shape[0]):
-			if (cdf[i] >= r[0]):
-				idx = i
-				break
+  else:
+    cdf = np.cumsum(probs)
+    for i in range(probs.shape[0]):
+      if (cdf[i] >= r[0]):
+        idx = i
+        break
 
-	return idx
+  return idx
 
 t = 0
 
@@ -120,34 +120,35 @@ while episode_number < episodes:
   drs.append(reward)
 
   if done:
-	t = 0
-	episode_number += 1
+    t = 0
+    episode_number += 1
 
-	epx = np.vstack(xs)
-	eph = np.vstack(hs)
-	epdlogp = np.vstack(dlogps)
-	epr = np.vstack(drs)
-	xs,hs,dlogps,drs = [],[],[],[] # reset array memory
+    epx = np.vstack(xs)
+    eph = np.vstack(hs)
+    epdlogp = np.vstack(dlogps)
+    epr = np.vstack(drs)
+    xs,hs,dlogps,drs = [],[],[],[] # reset array memory
 
-	discounted_epr = discount_rewards(epr)
-	discounted_epr -= np.mean(discounted_epr)
-	discounted_epr /= np.std(discounted_epr)
+    discounted_epr = discount_rewards(epr)
+    discounted_epr -= np.mean(discounted_epr)
+    discounted_epr /= np.std(discounted_epr)
 
-	epdlogp *= discounted_epr
-	grad = policy_backward(eph, epdlogp)
-	for k in model: 
-		grad_buffer[k] += grad[k]
+    epdlogp *= discounted_epr
+    grad = policy_backward(eph, epdlogp)
 
-	if episode_number % batch_size == 0:
-	  for k,v in model.iteritems():
-		g = grad_buffer[k]
-		rmsprop_cache[k] = decay_rate * rmsprop_cache[k] + (1 - decay_rate) * g**2
-		model[k] += learning_rate * g / (np.sqrt(rmsprop_cache[k]) + 1e-5)
-		grad_buffer[k] = np.zeros_like(v)
+    for k in model: 
+      grad_buffer[k] += grad[k]
 
-	running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
-	print 'resetting env. episode reward total was %f. running mean: %f' % (reward_sum, running_reward)
-	if episode_number % 10 == 0: pickle.dump(model, open('car.p', 'wb'))
-	history.append(running_reward)
-	reward_sum = 0
-	observation = env.reset()
+    if episode_number % batch_size == 0:
+      for k,v in model.items():
+        g = grad_buffer[k]
+        rmsprop_cache[k] = decay_rate * rmsprop_cache[k] + (1 - decay_rate) * g**2
+        model[k] += learning_rate * g / (np.sqrt(rmsprop_cache[k]) + 1e-5)
+        grad_buffer[k] = np.zeros_like(v)
+
+    running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
+    print('resetting env. episode reward total was {:}. running mean: {:}'.format(reward_sum, running_reward))
+    if episode_number % 10 == 0: pickle.dump(model, open('car.p', 'wb'))
+    history.append(running_reward)
+    reward_sum = 0
+    observation = env.reset()
